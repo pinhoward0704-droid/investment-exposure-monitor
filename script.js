@@ -33,7 +33,7 @@
             div.querySelectorAll('input').forEach(i => i.addEventListener('input', () => autoCalcLend(div)));
         } else if (type === 'loan') {
             div.innerHTML = `<input type="text" placeholder="貸款說明" value="${data.n||''}">
-                            <input type="number" placeholder="本金" class="loan_v" value="${data.v||''}">
+                            <input type="number" placeholder="剩餘本金" class="loan_v" value="${data.v||''}">
                             <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>`;
         }// 在 addItem 函數的 if-else 邏輯中加入
 		else if (type === 'foreign') {

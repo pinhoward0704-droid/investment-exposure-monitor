@@ -92,7 +92,6 @@
 		// 計算複委託資產
 	    let foreign_a = 0;
 	    document.querySelectorAll('#foreign_list .row').forEach(r => {
-	        const curr = r.querySelector('.f_curr').value;
 	        const val = parseFloat(r.querySelector('.f_val').value) || 0;
 	        
 	        foreign_a += val;      // 直接計入台幣

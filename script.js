@@ -35,7 +35,23 @@
             div.innerHTML = `<input type="text" placeholder="貸款說明" value="${data.n||''}">
                             <input type="number" placeholder="本金" class="loan_v" value="${data.v||''}">
                             <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>`;
-        }
+        }// 在 addItem 函數的 if-else 邏輯中加入
+		else if (type === 'foreign') {
+		    div.innerHTML = `
+		        <input type="text" placeholder="券商/帳戶" style="flex:0.6" value="${data.n||''}">
+		        <select class="f_curr" style="flex:0.4" onchange="calc()">
+		            <option value="TWD" ${data.cur==='TWD'?'selected':''}>台幣</option>
+		            <option value="USD" ${data.cur==='USD'?'selected':''}>美金</option>
+		        </select>
+		        <input type="number" placeholder="金額" class="f_val" value="${data.v||''}">
+		        <input type="number" placeholder="匯率" class="f_ex" value="${data.ex||'32'}" style="${data.cur==='USD'?'':'display:none;'}">
+		        <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>
+		    `;
+		    // 監聽幣別切換，隱藏/顯示匯率輸入框
+		    div.querySelector('.f_curr').addEventListener('change', function() {
+		        this.parentElement.querySelector('.f_ex').style.display = (this.value === 'USD') ? 'block' : 'none';
+		    });
+		}
         container.appendChild(div);
         calc();
     }
@@ -80,14 +96,29 @@
         const f_n = parseFloat(document.getElementById('fut_notional').value) || 0;
         const f_e = parseFloat(document.getElementById('fut_equity').value) || 0;
 
+		// 計算複委託資產
+	    let foreign_a = 0;
+	    document.querySelectorAll('#foreign_list .row').forEach(r => {
+	        const curr = r.querySelector('.f_curr').value;
+	        const val = parseFloat(r.querySelector('.f_val').value) || 0;
+	        const ex = parseFloat(r.querySelector('.f_ex').value) || 1;
+	        
+	        if (curr === 'USD') {
+	            foreign_a += val * ex; // 美金換算台幣
+	        } else {
+	            foreign_a += val;      // 直接計入台幣
+	        }
+	    });
         // 2. 核心邏輯
         // 總資產 = 現金 + 集保總持股(已含正二) + 質押品市值 + 出借市值 + 期貨權益數
-        const total_asset = total_cash + s_total + p_a + l_a + f_e;
+		// 總資產：加入複委託資產 (foreign_a)
+        const total_asset = total_cash + s_total + p_a + l_a + f_e + foreign_a;
         const total_debt = p_d + loan_d;
         const net_worth = total_asset - total_debt;
         
         // 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值
-        const total_exp = s_total + s_2x + p_a + l_a + f_n;
+        const total_exp = s_total + s_2x + p_a + l_a + f_n + foreign_a;
+		
 
         // 3. 更新介面
         document.getElementById('res_net').innerText = Math.round(net_worth) + " 萬";

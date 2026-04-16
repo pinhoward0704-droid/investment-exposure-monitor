@@ -113,6 +113,7 @@
         document.getElementById('res_net').innerText = Math.round(net_worth) + " 萬";
         document.getElementById('res_exp').innerText = Math.round(total_exp) + " 萬";
         document.getElementById('res_2x_pct').innerText = net_worth > 0 ? ((s_2x / net_worth) * 100).toFixed(1) + "%" : "0%";
+		document.getElementById('res_2x_pct_total').innerText = total_asset > 0 ? ((s_2x / total_asset) * 100).toFixed(1) + "%" : "0%";
         document.getElementById('res_lev').innerText = net_worth > 0 ? (total_exp / net_worth).toFixed(2) : "0.00";
 
         updateChart(total_cash, s_total, p_a, l_a, f_e);

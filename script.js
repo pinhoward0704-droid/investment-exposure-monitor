@@ -43,10 +43,7 @@
 		        <input type="number" placeholder="金額(台幣)" class="f_val" value="${data.v||''}">		        
 		        <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>
 		    `;
-		    // 監聽幣別切換，隱藏/顯示匯率輸入框
-		    div.querySelector('.f_curr').addEventListener('change', function() {
-		        this.parentElement.querySelector('.f_ex').style.display = (this.value === 'USD') ? 'block' : 'none';
-		    });
+		   
 		}
         container.appendChild(div);
         calc();

@@ -163,6 +163,8 @@
         document.querySelectorAll('#pledge_list .row').forEach(r => store.pledges.push({n:r.querySelector('.p_n').value, v1:r.querySelector('.p_d').value, v2:r.querySelector('.p_r').value, v3:r.querySelector('.p_a').value}));
         document.querySelectorAll('#lend_list .row').forEach(r => store.lends.push({c:r.querySelector('.l_code').value, q:r.querySelector('.l_qty').value, p:r.querySelector('.l_prc').value, v:r.querySelector('.l_v').value}));
         document.querySelectorAll('#loan_list .row').forEach(r => store.loans.push({n:r.children[0].value, v:r.children[1].value}));
+		document.querySelectorAll('#foreign_list .row').forEach(r => store.loans.push({n:r.children[0].value, v:r.children[1].value}));
+		
         localStorage.setItem('inv_dashboard_v3', JSON.stringify(store));
     }
 

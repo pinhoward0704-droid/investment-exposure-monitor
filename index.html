@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>極致投資曝險監控儀表板</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+        }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: #f4f7f9; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; font-weight: 700; border-bottom: 3px solid var(--accent); display: inline-block; width: 100%; padding-bottom: 10px; }
+        
+        .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+        .input-side { display: flex; flex-direction: column; gap: 20px; }
+        
+        .section { background: var(--light); padding: 15px; border-radius: 10px; border-left: 5px solid var(--accent); }
+        .section-title { font-weight: bold; margin-bottom: 15px; color: var(--primary); display: flex; justify-content: space-between; }
+        .desc { font-size: 0.8em; color: #7f8c8d; font-weight: normal; }
+
+        .row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+        input { padding: 8px 12px; border: 1px solid #bdc3c7; border-radius: 6px; flex: 1; min-width: 0; transition: border 0.3s; }
+        input:focus { border-color: var(--accent); outline: none; background: #fff; }
+        
+        button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.3s; padding: 8px 12px; }
+        .btn-add { background: var(--success); color: white; font-size: 0.85em; }
+        .btn-del { background: var(--danger); color: white; }
+        .btn-tool { background: var(--warning); color: white; font-size: 0.85em; }
+
+        .dashboard { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .stat-card { background: var(--primary); color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .stat-label { font-size: 0.9em; opacity: 0.8; margin-bottom: 5px; }
+        .stat-value { font-size: 1.8em; font-weight: bold; color: #f1c40f; }
+        .chart-container { background: white; padding: 15px; border-radius: 12px; border: 1px solid #ddd; height: 300px; }
+        
+        .badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; background: #34495e; margin-left: 5px; vertical-align: middle; }
+    </style>
+	<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>投資總曝險動態監控中心 <small style="font-size: 0.5em; color: gray;">單位：萬元</small></h1>
+
+    <div class="main-layout">
+        <div class="input-side">
+            
+            <div class="section">
+                <div class="section-title">流動資產 <span class="desc">現金與銀行存款</span></div>
+                <div class="row">
+                    <label>集保匯整存款：</label>
+                    <input type="number" id="cash_central" class="watch" placeholder="0">
+                </div>
+                <div id="cash_list"></div>
+                <button class="btn-add" onclick="addItem('cash')">+ 新增其他存款</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">集保證券 <span class="desc">包含正二之總值</span></div>
+                <div class="row">
+                    <label>總市值(含正二)：</label>
+                    <input type="number" id="stock_total" class="watch" placeholder="0">
+                </div>
+                <div class="row">
+                    <label>其中「正二」總值：</label>
+                    <input type="number" id="stock_2x" class="watch" placeholder="0">
+                    <span class="desc" style="color:var(--danger)">* 僅用於計算額外 1x 曝險</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">證券質押 <span class="desc">槓桿借貸</span></div>
+                <div id="pledge_list"></div>
+                <button class="btn-add" onclick="addItem('pledge')">+ 新增券商質押</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">股票出借 <span class="desc">信託部位</span></div>
+                <div id="lend_list"></div>
+                <button class="btn-add" onclick="addItem('lend')">+ 新增出借項目</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">信用貸款 <span class="desc">無擔保負債</span></div>
+                <div id="loan_list"></div>
+                <button class="btn-add" onclick="addItem('loan')">+ 新增信貸筆數</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">衍生性商品 <span class="desc">期貨合約管理</span></div>
+                <div class="row">
+                    <label>名目價值 <span class="badge">合約總價</span></label>
+                    <input type="number" id="fut_notional" class="watch" placeholder="0">
+                </div>
+                <div class="row">
+                    <label>權益數 <span class="badge">平倉淨值</span></label>
+                    <input type="number" id="fut_equity" class="watch" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-label">帳戶淨值 (Net Worth)</div>
+                <div id="res_net" class="stat-value">0 萬</div>
+                <div style="margin-top:15px;" class="stat-label">總曝險額 (Total Exposure)</div>
+                <div id="res_exp" class="stat-value">0 萬</div>
+            </div>
+
+            <div class="stat-card" style="background: #34495e;">
+                <div class="stat-label">正二占淨值比: <span id="res_2x_pct" style="color:#f1c40f">0%</span></div>
+                <div class="stat-label">總槓桿倍數: <span id="res_lev" style="color:#f1c40f">0.00</span></div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="assetChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myChart;
+
+    // 初始化動態監聽
+    document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('watch') || e.target.tagName === 'INPUT') {
+            calc();
+        }
+    });
+
+    function addItem(type, data = {}) {
+        const container = document.getElementById(`${type}_list`);
+        const div = document.createElement('div');
+        div.className = 'row';
+        
+        if (type === 'cash') {
+            div.innerHTML = `<input type="text" placeholder="銀行" value="${data.n||''}"> 
+                            <input type="number" placeholder="金額" class="val" value="${data.v||''}"> 
+                            <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>`;
+        } else if (type === 'pledge') {
+            div.innerHTML = `<input type="text" placeholder="券商" class="p_n" value="${data.n||''}">
+                            <input type="number" placeholder="借款" class="p_d" value="${data.v1||''}">
+                            <input type="number" placeholder="維持率%" class="p_r" value="${data.v2||''}">
+                            <input type="number" placeholder="抵押市值" class="p_a" value="${data.v3||''}">
+                            <button class="btn-tool" onclick="calcP(this)">換算</button>
+                            <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>`;
+        } else if (type === 'lend') {
+            div.innerHTML = `<input type="text" placeholder="代碼" class="l_code" style="flex:0.6" value="${data.c||''}">
+                            <input type="number" placeholder="張數" class="l_qty" style="flex:0.6" value="${data.q||''}">
+                            <input type="number" placeholder="單價" class="l_prc" style="flex:0.6" value="${data.p||''}">
+                            <input type="number" placeholder="市值" class="l_v" value="${data.v||''}">
+                            <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>`;
+            div.querySelectorAll('input').forEach(i => i.addEventListener('input', () => autoCalcLend(div)));
+        } else if (type === 'loan') {
+            div.innerHTML = `<input type="text" placeholder="貸款說明" value="${data.n||''}">
+                            <input type="number" placeholder="本金" class="loan_v" value="${data.v||''}">
+                            <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>`;
+        }
+        container.appendChild(div);
+        calc();
+    }
+
+    function calcP(btn) {
+        const row = btn.parentElement;
+        const d = parseFloat(row.querySelector('.p_d').value);
+        const r = parseFloat(row.querySelector('.p_r').value);
+        if (d && r) {
+            row.querySelector('.p_a').value = Math.round((d * r) / 100);
+            calc();
+        }
+    }
+
+    function autoCalcLend(row) {
+        const q = parseFloat(row.querySelector('.l_qty').value);
+        const p = parseFloat(row.querySelector('.l_prc').value);
+        if (q && p) {
+            row.querySelector('.l_v').value = (q * p * 1000 / 10000).toFixed(1);
+            calc();
+        }
+    }
+
+    function calc() {
+        // 1. 取得數值
+        const c_cen = parseFloat(document.getElementById('cash_central').value) || 0;
+        let c_oth = 0; document.querySelectorAll('#cash_list .val').forEach(i => c_oth += parseFloat(i.value)||0);
+        const total_cash = c_cen + c_oth;
+
+        const s_total = parseFloat(document.getElementById('stock_total').value) || 0;
+        const s_2x = parseFloat(document.getElementById('stock_2x').value) || 0;
+        
+        let p_a = 0, p_d = 0;
+        document.querySelectorAll('#pledge_list .row').forEach(r => {
+            p_a += parseFloat(r.querySelector('.p_a').value)||0;
+            p_d += parseFloat(r.querySelector('.p_d').value)||0;
+        });
+
+        let l_a = 0; document.querySelectorAll('#lend_list .l_v').forEach(i => l_a += parseFloat(i.value)||0);
+        let loan_d = 0; document.querySelectorAll('#loan_list .loan_v').forEach(i => loan_d += parseFloat(i.value)||0);
+        
+        const f_n = parseFloat(document.getElementById('fut_notional').value) || 0;
+        const f_e = parseFloat(document.getElementById('fut_equity').value) || 0;
+
+        // 2. 核心邏輯
+        // 總資產 = 現金 + 集保總持股(已含正二) + 質押品市值 + 出借市值 + 期貨權益數
+        const total_asset = total_cash + s_total + p_a + l_a + f_e;
+        const total_debt = p_d + loan_d;
+        const net_worth = total_asset - total_debt;
+        
+        // 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值
+        const total_exp = s_total + s_2x + p_a + l_a + f_n;
+
+        // 3. 更新介面
+        document.getElementById('res_net').innerText = Math.round(net_worth) + " 萬";
+        document.getElementById('res_exp').innerText = Math.round(total_exp) + " 萬";
+        document.getElementById('res_2x_pct').innerText = net_worth > 0 ? ((s_2x / net_worth) * 100).toFixed(1) + "%" : "0%";
+        document.getElementById('res_lev').innerText = net_worth > 0 ? (total_exp / net_worth).toFixed(2) : "0.00";
+
+        updateChart(total_cash, s_total, p_a, l_a, f_e);
+        save();
+    }
+
+    function updateChart(cash, stock, pledge, lend, fut) {
+        const ctx = document.getElementById('assetChart').getContext('2d');
+        const data = [cash, stock, pledge, lend, fut];
+        const labels = ['現金', '集保股票', '質押標的', '出借部位', '期貨權益'];
+
+        if (myChart) {
+            myChart.data.datasets[0].data = data;
+            myChart.update();
+        } else {
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                        title: { display: true, text: '資產配置分布' }
+                    }
+                }
+            });
+        }
+    }
+
+    function save() {
+        const store = {
+            c_c: document.getElementById('cash_central').value,
+            s_t: document.getElementById('stock_total').value,
+            s_2: document.getElementById('stock_2x').value,
+            f_n: document.getElementById('fut_notional').value,
+            f_e: document.getElementById('fut_equity').value,
+            cashes: [], pledges: [], lends: [], loans: []
+        };
+        document.querySelectorAll('#cash_list .row').forEach(r => store.cashes.push({n:r.children[0].value, v:r.children[1].value}));
+        document.querySelectorAll('#pledge_list .row').forEach(r => store.pledges.push({n:r.querySelector('.p_n').value, v1:r.querySelector('.p_d').value, v2:r.querySelector('.p_r').value, v3:r.querySelector('.p_a').value}));
+        document.querySelectorAll('#lend_list .row').forEach(r => store.lends.push({c:r.querySelector('.l_code').value, q:r.querySelector('.l_qty').value, p:r.querySelector('.l_prc').value, v:r.querySelector('.l_v').value}));
+        document.querySelectorAll('#loan_list .row').forEach(r => store.loans.push({n:r.children[0].value, v:r.children[1].value}));
+        localStorage.setItem('inv_dashboard_v3', JSON.stringify(store));
+    }
+
+    window.onload = () => {
+        const saved = JSON.parse(localStorage.getItem('inv_dashboard_v3') || '{}');
+        if(saved.c_c !== undefined) {
+            document.getElementById('cash_central').value = saved.c_c;
+            document.getElementById('stock_total').value = saved.s_t;
+            document.getElementById('stock_2x').value = saved.s_2;
+            document.getElementById('fut_notional').value = saved.f_n;
+            document.getElementById('fut_equity').value = saved.f_e;
+            saved.cashes.forEach(d => addItem('cash', d));
+            saved.pledges.forEach(d => addItem('pledge', d));
+            saved.lends.forEach(d => addItem('lend', d));
+            saved.loans.forEach(d => addItem('loan', d));
+        }
+        calc();
+    };
+	
+	
+</script>
+</body>
+</html>

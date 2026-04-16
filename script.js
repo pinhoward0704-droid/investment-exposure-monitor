@@ -39,12 +39,8 @@
 		else if (type === 'foreign') {
 		    div.innerHTML = `
 		        <input type="text" placeholder="券商/帳戶" style="flex:0.6" value="${data.n||''}">
-		        <select class="f_curr" style="flex:0.4" onchange="calc()">
-		            <option value="TWD" ${data.cur==='TWD'?'selected':''}>台幣</option>
-		            <option value="USD" ${data.cur==='USD'?'selected':''}>美金</option>
-		        </select>
-		        <input type="number" placeholder="金額" class="f_val" value="${data.v||''}">
-		        <input type="number" placeholder="匯率" class="f_ex" value="${data.ex||'32'}" style="${data.cur==='USD'?'':'display:none;'}">
+		        
+		        <input type="number" placeholder="金額(台幣)" class="f_val" value="${data.v||''}">		        
 		        <button class="btn-del" onclick="this.parentElement.remove(); calc();">X</button>
 		    `;
 		    // 監聽幣別切換，隱藏/顯示匯率輸入框
@@ -101,13 +97,9 @@
 	    document.querySelectorAll('#foreign_list .row').forEach(r => {
 	        const curr = r.querySelector('.f_curr').value;
 	        const val = parseFloat(r.querySelector('.f_val').value) || 0;
-	        const ex = parseFloat(r.querySelector('.f_ex').value) || 1;
 	        
-	        if (curr === 'USD') {
-	            foreign_a += val * ex; // 美金換算台幣
-	        } else {
-	            foreign_a += val;      // 直接計入台幣
-	        }
+	        foreign_a += val;      // 直接計入台幣
+	        
 	    });
         // 2. 核心邏輯
         // 總資產 = 現金 + 集保總持股(已含正二) + 質押品市值 + 出借市值 + 期貨權益數

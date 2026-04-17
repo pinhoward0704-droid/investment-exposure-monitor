@@ -150,20 +150,26 @@
         }
     }
 
-    function save() {
+    function save() { 
         const store = {
             c_c: document.getElementById('cash_central').value,
             s_t: document.getElementById('stock_total').value,
             s_2: document.getElementById('stock_2x').value,
             f_n: document.getElementById('fut_notional').value,
             f_e: document.getElementById('fut_equity').value,
-            cashes: [], pledges: [], lends: [], loans: []
-        };
+			
+            cashes: [], pledges: [], lends: [], loans: [],foreigns: []     
+   };
         document.querySelectorAll('#cash_list .row').forEach(r => store.cashes.push({n:r.children[0].value, v:r.children[1].value}));
         document.querySelectorAll('#pledge_list .row').forEach(r => store.pledges.push({n:r.querySelector('.p_n').value, v1:r.querySelector('.p_d').value, v2:r.querySelector('.p_r').value, v3:r.querySelector('.p_a').value}));
         document.querySelectorAll('#lend_list .row').forEach(r => store.lends.push({c:r.querySelector('.l_code').value, q:r.querySelector('.l_qty').value, p:r.querySelector('.l_prc').value, v:r.querySelector('.l_v').value}));
         document.querySelectorAll('#loan_list .row').forEach(r => store.loans.push({n:r.children[0].value, v:r.children[1].value}));
-		document.querySelectorAll('#foreign_list .row').forEach(r => store.loans.push({n:r.children[0].value, v:r.children[1].value}));
+		document.querySelectorAll('#foreign_list .row').forEach(r => {
+        store.foreigns.push({
+            n: r.children[0].value, 
+            v: r.querySelector('.f_val').value
+        });
+    });
 		
         localStorage.setItem('inv_dashboard_v3', JSON.stringify(store));
     }
@@ -180,6 +186,11 @@
             saved.pledges.forEach(d => addItem('pledge', d));
             saved.lends.forEach(d => addItem('lend', d));
             saved.loans.forEach(d => addItem('loan', d));
+// 新增：讀取並渲染複委託列表
+        if (saved.foreigns) {
+            saved.foreigns.forEach(d => addItem('foreign', d));
+        }
+
         }
         calc();
     };

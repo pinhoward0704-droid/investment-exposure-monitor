@@ -138,7 +138,7 @@
     document.getElementById('sim_net_total').innerText = Math.round(simNetTotal);
 
     // 5. 質押維持率預警模擬 
-    let warningHTML = "";
+    let  = "";
     document.querySelectorAll('#pledge_list .row').forEach((r, index) => {
         const pledgeValue = parseFloat(r.querySelector('.p_a').value) || 0;
         const loanAmount = parseFloat(r.querySelector('.p_d').value) || 0;
@@ -149,12 +149,12 @@
             const simRatio = ((pledgeValue * (1 + simPct / 100)) / loanAmount) * 100;
             
             if (simRatio < 135) { // 接近 130% 追繳紅線 [cite: 5, 8]
-                warningHTML += `<div style="color: #e74c3c;">🚨 ${broker} 預估維持率降至 ${simRatio.toFixed(1)}% (危險)</div>`;
+                //warningHTML += `<div style="color: #e74c3c;">🚨 ${broker} 預估維持率降至 ${simRatio.toFixed(1)}% (危險)</div>`;
             }
         }
     });
     
-    document.getElementById('sim_warning').innerHTML = warningHTML || `<div style="color: #27ae60;">✅ 模擬情境下暫無追繳風險</div>`;
+    //document.getElementById('sim_warning').innerHTML =  || `<div style="color: #27ae60;">✅ 模擬情境下暫無追繳風險</div>`;
     }
 
     function updateChart(cash, stock, pledge, lend, fut) {

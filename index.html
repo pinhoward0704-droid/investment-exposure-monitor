@@ -133,6 +133,27 @@
             <div class="chart-container">
                 <canvas id="assetChart"></canvas>
             </div>
+			<div class="card mt-4" style="border: 1px solid #e74c3c;">
+    <div class="card-header" style="background: #fdf2f2; color: #e74c3c; font-weight: bold;">
+        ⚠️ 壓力測試 (Stress Test) — 模擬市場波動
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <label>模擬大盤漲跌幅度：<span id="sim_pct_text" style="font-weight:bold; color:#e74c3c;">0</span> %</label>
+                <input type="range" class="form-range" id="sim_range" min="-50" max="50" step="1" value="0" oninput="calc()">
+                <small class="text-muted">（向左模擬崩盤，向右模擬漲幅）</small>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
+                    <div>預估淨值變化：<span id="sim_net_change" style="font-weight:bold;">0</span> 萬</div>
+                    <div>模擬後總淨值：<span id="sim_net_total" style="font-weight:bold;">0</span> 萬</div>
+                    <div id="sim_warning" class="mt-2" style="font-size: 0.9em;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

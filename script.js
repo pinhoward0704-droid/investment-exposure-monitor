@@ -124,8 +124,8 @@
 
     function updateChart(cash, stock, pledge, lend, fut) {
         const ctx = document.getElementById('assetChart').getContext('2d');
-        const data = [cash, stock, pledge, lend, fut];
-        const labels = ['現金', '集保股票', '質押標的', '出借部位', '期貨權益'];
+        const data = [cash, stock+ pledge+ lend, fut];
+        const labels = ['現金', '總持股', '期貨權益'];
 
         if (myChart) {
             myChart.data.datasets[0].data = data;
@@ -137,7 +137,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#9b59b6', '#e67e22'],
+                        backgroundColor: ['#2ecc71', '#3498db',  '#e67e22'],//'#f1c40f', '#9b59b6',
                         borderWidth: 0
                     }]
                 },

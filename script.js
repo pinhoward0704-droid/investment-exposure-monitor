@@ -120,6 +120,41 @@
 
         updateChart(total_cash, s_total, p_a, l_a, f_e);
         save();
+
+		// 4. 壓力測試模擬邏輯
+    const simPct = parseFloat(document.getElementById('sim_range').value) || 0;
+    document.getElementById('sim_pct_text').innerText = (simPct > 0 ? "+" : "") + simPct;
+
+    // 模擬淨值變化 = 總曝險 * 漲跌幅 %
+    // 因為總曝險已包含：集保(含正二)、正二額外1次、質押品、出借、期貨名目價值 
+    const simNetChange = total_exp * (simPct / 100);
+    const simNetTotal = net_worth + simNetChange;
+
+    // 更新介面顯示
+    const changeEl = document.getElementById('sim_net_change');
+    changeEl.innerText = (simNetChange > 0 ? "+" : "") + Math.round(simNetChange);
+    changeEl.style.color = simNetChange >= 0 ? "#e74c3c" : "#27ae60"; // 漲顯紅(損益變動), 跌顯綠
+
+    document.getElementById('sim_net_total').innerText = Math.round(simNetTotal);
+
+    // 5. 質押維持率預警模擬 
+    let warningHTML = "";
+    document.querySelectorAll('#pledge_list .row').forEach((r, index) => {
+        const pledgeValue = parseFloat(r.querySelector('.p_a').value) || 0;
+        const loanAmount = parseFloat(r.querySelector('.p_d').value) || 0;
+        const broker = r.querySelector('.p_n').value || `項目 ${index + 1}`;
+
+        if (loanAmount > 0) {
+            // 模擬後的維持率 = (原始市值 * (1 + 漲跌幅%)) / 借款金額
+            const simRatio = ((pledgeValue * (1 + simPct / 100)) / loanAmount) * 100;
+            
+            if (simRatio < 135) { // 接近 130% 追繳紅線 [cite: 5, 8]
+                warningHTML += `<div style="color: #e74c3c;">🚨 ${broker} 預估維持率降至 ${simRatio.toFixed(1)}% (危險)</div>`;
+            }
+        }
+    });
+    
+    document.getElementById('sim_warning').innerHTML = warningHTML || `<div style="color: #27ae60;">✅ 模擬情境下暫無追繳風險</div>`;
     }
 
     function updateChart(cash, stock, pledge, lend, fut) {

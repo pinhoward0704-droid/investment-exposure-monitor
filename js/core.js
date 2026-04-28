@@ -12,7 +12,7 @@ function calc() {
 	let c_oth = 0; document.querySelectorAll('#cash_list .val').forEach(i => c_oth += parseFloat(i.value)||0);
 	const total_cash = c_cen + c_oth;
 
-	const s_total = parseFloat(document.getElementById('stock_total').value) || 0;
+	//const s_total = parseFloat(document.getElementById('stock_total').value) || 0;
 	const s_2x = parseFloat(document.getElementById('stock_2x').value) || 0;
 	
 	let p_a = 0, p_d = 0;

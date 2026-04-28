@@ -1,144 +1,140 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>投資曝險計算</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
-	
-	<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-	<script src="js/core.js"></script>
-	<script src="js/app.js"></script>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>投資曝險計算</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="style.css">
 
-<div class="container">
-    <h1>投資總曝險計算 <small style="font-size: 0.5em; color: gray;">單位：萬元</small></h1>
-<div class="d-flex justify-content-end mb-2" style="font-size: 0.85em; color: #7f8c8d;">
-    <span>🟢 在線人數：<span id="online_count">...</span> 人</span>
-    <span class="ms-3">📊 累計人數：<span id="global_use_count">載入中...</span> 次</span>
-</div>
-    <div class="main-layout">
-        <div class="input-side">
-            
-            <div class="section">
-                <div class="section-title">流動資產 <span class="desc">現金與銀行存款</span></div>
-                <div class="row">
-                    <label>集保匯整存款：</label>
-                    <input type="number" id="cash_central" class="watch" placeholder="0">
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+        <script src="js/core.js"></script>
+        <script src="js/app.js"></script>
+    </head>
+    <body>
+
+        <div class="container">
+            <h1>投資總曝險計算 <small style="font-size: 0.5em; color: gray;">單位：萬元</small></h1>
+<!--            <div class="d-flex justify-content-end mb-2" style="font-size: 0.85em; color: #7f8c8d;">
+                <span>🟢 在線人數：<span id="online_count">...</span> 人</span>
+                <span class="ms-3">📊 累計人數：<span id="global_use_count">載入中...</span> 次</span>
+            </div>-->
+            <div class="main-layout">
+                <div class="input-side">
+
+                    <div class="section">
+                        <div class="section-title">流動資產 <span class="desc">現金與銀行存款</span></div>
+                        <div class="row">
+                            <label>集保匯整存款：</label>
+                            <input type="number" id="cash_central" class="watch" placeholder="0">
+                        </div>
+                        <div id="cash_list"></div>
+                        <button class="btn-add" onclick="addItem('cash')">+ 新增其他存款</button>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">集保證券 <span class="desc">包含正二之總值</span></div>
+                        <div class="row">
+                            <label>總市值(含正二)：</label>
+                            <input type="number" id="stock_total" class="watch" placeholder="0">
+                        </div>
+                        <div class="row">
+                            <label>其中「正二」總值：</label>
+                            <input type="number" id="stock_2x" class="watch" placeholder="0">
+                            <span class="desc" style="color:var(--danger)">* 用於計算額外 1x 曝險</span>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">複委託資產 <span class="desc">海外證券 (美股/英股等)</span></div>
+                        <div id="foreign_list"></div>
+                        <button class="btn-add" onclick="addItem('foreign')">+ 新增複委託帳戶</button>
+                    </div>
+                    
+
+                    <div class="section">
+                        <div class="section-title">股票出借 <span class="desc">信託部位</span></div>
+                        <div id="lend_list"></div>
+                        <button class="btn-add" onclick="addItem('lend')">+ 新增出借項目</button>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">證券質押 <span class="desc">質押股加入總持股、質借額加入總負債</span></div>
+                        <div id="pledge_list"></div>
+                        <button class="btn-add" onclick="addItem('pledge')">+ 新增券商質押</button>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">各式貸款 <span class="desc">各式信貸、理財型房貸</span></div>
+                        <div id="loan_list"></div>
+                        <button class="btn-add" onclick="addItem('loan')">+ 新增貸款資料</button>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">衍生性商品 <span class="desc">期貨合約管理</span></div>
+                        <div class="row">
+                            <label>名目價值 <span class="badge">合約總價-加入總曝險金額</span></label>
+                            <input type="number" id="fut_notional" class="watch" placeholder="0">
+                        </div>
+                        <div class="row">
+                            <label>權益數 <span class="badge">平倉淨值-加入總資產</span></label>
+                            <input type="number" id="fut_equity" class="watch" placeholder="0">
+                        </div>
+                    </div>
                 </div>
-                <div id="cash_list"></div>
-                <button class="btn-add" onclick="addItem('cash')">+ 新增其他存款</button>
-            </div>
 
-            <div class="section">
-                <div class="section-title">集保證券 <span class="desc">包含正二之總值</span></div>
-                <div class="row">
-                    <label>總市值(含正二)：</label>
-                    <input type="number" id="stock_total" class="watch" placeholder="0">
-                </div>
-                <div class="row">
-                    <label>其中「正二」總值：</label>
-                    <input type="number" id="stock_2x" class="watch" placeholder="0">
-                    <span class="desc" style="color:var(--danger)">* 僅用於計算額外 1x 曝險</span>
-                </div>
-            </div>
-<div class="section">
-    <div class="section-title">複委託資產 <span class="desc">海外證券 (美股/英股等)</span></div>
-    <div id="foreign_list"></div>
-    <button class="btn-add" onclick="addItem('foreign')">+ 新增複委託帳戶</button>
-</div>
-            <div class="section">
-                <div class="section-title">證券質押 <span class="desc">槓桿借貸</span></div>
-                <div id="pledge_list"></div>
-                <button class="btn-add" onclick="addItem('pledge')">+ 新增券商質押</button>
-            </div>
+                <div class="dashboard">
+                    <div class="stat-card">
+                        <div class="stat-label">投資總值(總持股+期貨權益)</div>
+                        <div id="res_total" class="stat-value">0 萬</div>
+                        <div class="stat-label">借貸餘額(各式貸款餘額+質押)</div>
+                        <div id="res_loan" class="stat-value">0 萬</div>
 
-            <div class="section">
-                <div class="section-title">股票出借 <span class="desc">信託部位</span></div>
-                <div id="lend_list"></div>
-                <button class="btn-add" onclick="addItem('lend')">+ 新增出借項目</button>
-            </div>
+                        <div class="stat-label">負債比 (總負債/總資產) 
+                            <span id="ratio_status" style="font-size: 0.8em; margin-left:5px;"></span>
+                        </div>
+                        <div id="res_loanRetio" class="stat-value">0%</div>
 
-            <div class="section">
-                <div class="section-title">各式貸款 <span class="desc">信貸、理財型房貸</span></div>
-                <div id="loan_list"></div>
-                <button class="btn-add" onclick="addItem('loan')">+ 新增貸款資料</button>
-            </div>
+                        <div class="stat-label">淨值 (投資總值-借貸餘額+現金部位)</div>
+                        <div id="res_net" class="stat-value">0 萬</div>
+                        <div style="margin-top:15px;" class="stat-label">總曝險額 (Total Exposure)</div>
+                        <div id="res_exp" class="stat-value">0 萬</div>
+                    </div>
 
-            <div class="section">
-                <div class="section-title">衍生性商品 <span class="desc">期貨合約管理</span></div>
-                <div class="row">
-                    <label>名目價值 <span class="badge">合約總價</span></label>
-                    <input type="number" id="fut_notional" class="watch" placeholder="0">
-                </div>
-                <div class="row">
-                    <label>權益數 <span class="badge">平倉淨值</span></label>
-                    <input type="number" id="fut_equity" class="watch" placeholder="0">
+                    <div class="stat-card" style="background: #34495e;">
+                        <div class="stat-label">正二占總持股比: <span id="res_2x_pct_total" style="color:#f1c40f">0%</span></div>
+                        <div class="stat-label">總槓桿倍數: <span id="res_lev" style="color:#f1c40f">0.00</span></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="assetChart"></canvas>
+                    </div>
+                    <div class="card mt-4" style="border: 1px solid #e74c3c;">
+                        <div class="card-header" style="background: #fdf2f2; color: #e74c3c; font-weight: bold;">
+                            ⚠️ 壓力測試 (Stress Test) — 模擬市場波動
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <label>模擬大盤漲跌幅度：<span id="sim_pct_text" style="font-weight:bold; color:#e74c3c;">0</span> %</label>                
+                                </div>
+                                <hr>
+                                <div class="col-md-8">
+                                    <input type="range" class="form-range" id="sim_range" min="-80" max="80" step="1" value="0" oninput="calc()">                
+                                </div>
+                                <hr>
+                                <div class="col-md-8">                
+                                    <small class="text-muted">向左模擬下跌，向右模擬漲幅</small>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
+                                        <div>預估淨值變化：<span id="sim_net_change" style="font-weight:bold;">0</span> 萬</div>
+                                        <div>模擬後總淨值：<span id="sim_net_total" style="font-weight:bold;">0</span> 萬</div>
+                                        <div display="none" id="sim_warning" class="mt-2" style="font-size: 0.9em;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="dashboard">
-            <div class="stat-card">
-				<div class="stat-label">投資總值(總持股+期貨權益)</div>
-                <div id="res_total" class="stat-value">0 萬</div>
-				<div class="stat-label">借貸餘額(各式貸款餘額+質押)</div>
-                <div id="res_loan" class="stat-value">0 萬</div>
-				
-				<div class="stat-label">負債比 (總負債/總資產) 
-					<span id="ratio_status" style="font-size: 0.8em; margin-left:5px;"></span>
-				</div>
-				<div id="res_loanRetio" class="stat-value">0%</div>
-				
-                <div class="stat-label">淨值 (投資總值-借貸餘額+現金部位)</div>
-                <div id="res_net" class="stat-value">0 萬</div>
-                <div style="margin-top:15px;" class="stat-label">總曝險額 (Total Exposure)</div>
-                <div id="res_exp" class="stat-value">0 萬</div>
-            </div>
-
-            <div class="stat-card" style="background: #34495e;">
-                <!--div class="stat-label">正二占淨值比: <span id="res_2x_pct" style="color:#f1c40f">0%</span></div-->
-				<div class="stat-label">正二占總持股比: <span id="res_2x_pct_total" style="color:#f1c40f">0%</span></div>
-                <div class="stat-label">總槓桿倍數: <span id="res_lev" style="color:#f1c40f">0.00</span></div>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="assetChart"></canvas>
-            </div>
-			<div class="card mt-4" style="border: 1px solid #e74c3c;">
-    <div class="card-header" style="background: #fdf2f2; color: #e74c3c; font-weight: bold;">
-        ⚠️ 壓力測試 (Stress Test) — 模擬市場波動
-    </div>
-    <div class="card-body">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <label>模擬大盤漲跌幅度：<span id="sim_pct_text" style="font-weight:bold; color:#e74c3c;">0</span> %</label>                
-            </div>
-			<hr>
-			<div class="col-md-8">
-                <input type="range" class="form-range" id="sim_range" min="-80" max="80" step="1" value="0" oninput="calc()">                
-            </div>
-			<hr>
-			<div class="col-md-8">                
-                <small class="text-muted">向左模擬下跌，向右模擬漲幅</small>
-            </div>
-            <div class="col-md-8">
-                <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
-                    <div>預估淨值變化：<span id="sim_net_change" style="font-weight:bold;">0</span> 萬</div>
-                    <div>模擬後總淨值：<span id="sim_net_total" style="font-weight:bold;">0</span> 萬</div>
-                    <div display="none" id="sim_warning" class="mt-2" style="font-size: 0.9em;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-        </div>
-    </div>
-</div>
-
-
-</body>
+    </body>
 </html>

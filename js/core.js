@@ -37,7 +37,9 @@ function calc() {
 	
 	// 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值
 	const total_exp = s_total + s_2x + p_a + l_a + f_n + foreign_a;
-	
+
+	// --- 新增：負債比計算 ---
+    let debtRatio = total_asset > 0 ? (total_debt / total_asset) * 100 : 0;
 
 	// 3. 更新介面
 	document.getElementById('res_total').innerText = Math.round(total_asset) + " 萬";
@@ -45,6 +47,25 @@ function calc() {
 	
 	document.getElementById('res_net').innerText = Math.round(net_worth) + " 萬";
 	document.getElementById('res_exp').innerText = Math.round(total_exp) + " 萬";
+
+	// 更新負債比數值與顏色
+    const ratioEl = document.getElementById('res_loanRetio');
+    const statusEl = document.getElementById('ratio_status');
+    ratioEl.innerText = debtRatio.toFixed(1) + "%";
+    
+    if (debtRatio > 60) {
+        ratioEl.style.color = "#e74c3c"; // 紅色
+        statusEl.innerText = "(極高)";
+        statusEl.style.color = "#e74c3c";
+    } else if (debtRatio > 40) {
+        ratioEl.style.color = "#f39c12"; // 橘色
+        statusEl.innerText = "(注意)";
+        statusEl.style.color = "#f39c12";
+    } else {
+        ratioEl.style.color = "#2ecc71"; // 綠色
+        statusEl.innerText = "(安全)";
+        statusEl.style.color = "#2ecc71";
+    }
 	//document.getElementById('res_2x_pct').innerText = net_worth > 0 ? ((s_2x / net_worth) * 100).toFixed(1) + "%" : "0%";
 	document.getElementById('res_2x_pct_total').innerText = total_asset > 0 ? ((s_2x / total_asset) * 100).toFixed(1) + "%" : "0%";
 	document.getElementById('res_lev').innerText = net_worth > 0 ? (total_exp / net_worth).toFixed(2) : "0.00";

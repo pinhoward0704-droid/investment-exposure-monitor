@@ -56,7 +56,7 @@ function calc() {
 	const net_worth = total_asset - total_debt + total_cash;
 	
 	// 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值
-	const total_exp = s_total + s_2x + p_a + l_a + f_n + foreign_a;
+	//const total_exp = s_total + s_2x + p_a + l_a + f_n + foreign_a;
 
 	// --- 新增：負債比計算 ---
     let debtRatio = total_asset > 0 ? (total_debt / total_asset) * 100 : 0;

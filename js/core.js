@@ -23,6 +23,7 @@ function calc() {
 
 	let l_a = 0; document.querySelectorAll('#lend_list .l_v').forEach(i => l_a += parseFloat(i.value)||0);
 	let loan_d = 0; document.querySelectorAll('#loan_list .loan_v').forEach(i => loan_d += parseFloat(i.value)||0);
+	let total_debt = 0;//總借貸
 	
 	const f_n = parseFloat(document.getElementById('fut_notional').value) || 0;
 	const f_e = parseFloat(document.getElementById('fut_equity').value) || 0;
@@ -53,7 +54,7 @@ function calc() {
 	// 總資產：加入複委託資產 (foreign_a)
 	const total_asset = total_cash + s_total + f_e; 
     const total_exp = s_total + s_2x + f_n; // 正二額外加 1 次 [cite: 66, 113]
-	let total_debt = 0;
+	
 	
 	const net_worth = total_asset - total_debt + total_cash;
 	

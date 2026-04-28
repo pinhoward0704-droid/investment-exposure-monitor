@@ -31,9 +31,9 @@ function calc() {
 	// 2. 核心邏輯
 	// 總資產 = 現金 + 集保總持股(已含正二) + 質押品市值 + 出借市值 + 期貨權益數
 	// 總資產：加入複委託資產 (foreign_a)
-	const total_asset = total_cash + s_total + p_a + l_a + f_e + foreign_a;
+	const total_asset = s_total + p_a + l_a + f_e + foreign_a;
 	const total_debt = p_d + loan_d;
-	const net_worth = total_asset - total_debt;
+	const net_worth = total_asset - total_debt + total_cash;
 	
 	// 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值
 	const total_exp = s_total + s_2x + p_a + l_a + f_n + foreign_a;

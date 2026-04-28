@@ -17,13 +17,18 @@ function calc() {
 	
 	let p_a = 0, p_d = 0;
 	document.querySelectorAll('#pledge_list .row').forEach(r => {
-		p_a += parseFloat(r.querySelector('.p_a').value)||0;
-		p_d += parseFloat(r.querySelector('.p_d').value)||0;
+		p_a += parseFloat(r.querySelector('.p_a').value)||0;//質押抵押市值
+		p_d += parseFloat(r.querySelector('.p_d').value)||0;//質押借款
+	});
+
+	let total_loan = 0;//總信貸、理財型房貸
+	document.querySelectorAll('#loan_list .row').forEach(r => {
+		total_loan += parseFloat(r.querySelector('.loan_v').value)||0;//	
 	});
 
 	let l_a = 0; document.querySelectorAll('#lend_list .l_v').forEach(i => l_a += parseFloat(i.value)||0);
 	let loan_d = 0; document.querySelectorAll('#loan_list .loan_v').forEach(i => loan_d += parseFloat(i.value)||0);
-	let total_debt = 0;//總借貸
+	let total_debt = p_d + total_loan;//總借貸(質押借款)
 	
 	const f_n = parseFloat(document.getElementById('fut_notional').value) || 0;
 	const f_e = parseFloat(document.getElementById('fut_equity').value) || 0;

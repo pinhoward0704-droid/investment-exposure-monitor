@@ -104,8 +104,10 @@ function save() {
     // 獲取當前日期與時間
     const now = new Date();
     const dateString = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const store = {
+    
+	const store = {
         last_update: dateString, // 新增日期欄位 [cite: 94]
+		is_manual: document.getElementById('manual_mode').checked,
         c_c: document.getElementById('cash_central').value,
         s_t: document.getElementById('stock_total').value,
         s_2: document.getElementById('stock_2x').value,

@@ -33,34 +33,37 @@
                         <button class="btn-add" onclick="addItem('cash')">+ 新增其他存款</button>
                     </div>
 
-                    <div class="section">
-                        <div class="section-title">集保證券 <span class="desc">包含正二之總值</span></div>
-                        <div class="row">
-                            <label>總市值(含正二)：</label>
-                            <input type="number" id="stock_total" class="watch" placeholder="0">
-                        </div>
-                        <div class="row">
-                            <label>其中「正二」總值：</label>
-                            <input type="number" id="stock_2x" class="watch" placeholder="0">
-                            <span class="desc" style="color:var(--danger)">* 用於計算額外 1x 曝險</span>
-                        </div>
-                    </div>
-                    <div class="section">
-                        <div class="section-title">複委託資產 <span class="desc">海外證券 (美股/英股等)</span></div>
-                        <div id="foreign_list"></div>
-                        <button class="btn-add" onclick="addItem('foreign')">+ 新增複委託帳戶</button>
+                    <div class="text-muted mb-2" style="font-size: 0.85em;">
+                        📅 最後更新日期：<span id="update_date">尚未記錄</span>
                     </div>
                     
-
-                    <div class="section">
-                        <div class="section-title">股票出借 <span class="desc">信託部位</span></div>
-                        <div id="lend_list"></div>
-                        <button class="btn-add" onclick="addItem('lend')">+ 新增出借項目</button>
-                    </div>
-                    <div class="section">
-                        <div class="section-title">證券質押 <span class="desc">質押股加入總持股、質借額加入總負債</span></div>
-                        <div id="pledge_list"></div>
-                        <button class="btn-add" onclick="addItem('pledge')">+ 新增券商質押</button>
+                    <div class="asset-group-container" style="border: 2px solid #3498db; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div class="section-title" style="color: #2980b9; border-bottom: 2px solid #3498db; margin-bottom: 15px;">
+                            📊 證券資產細項 
+                            <label style="float: right; font-size: 0.7em; cursor: pointer;">
+                                <input type="checkbox" id="manual_mode" onchange="toggleManualMode()"> 手動輸入總市值
+                            </label>
+                        </div>
+                    
+                        <div class="section">
+                            <label>集保總值(含正二)：</label>
+                            <input type="number" id="stock_total" class="watch" placeholder="0">
+                        </div>
+                    
+                        <div class="section">
+                            <div id="foreign_list"></div>
+                            <button class="btn-add sub-item" onclick="addItem('foreign')">+ 新增複委託帳戶</button>
+                        </div>
+                    
+                        <div class="section">
+                            <div id="pledge_list"></div>
+                            <button class="btn-add sub-item" onclick="addItem('pledge')">+ 新增質押項目</button>
+                        </div>
+                    
+                        <div class="section">
+                            <div id="lend_list"></div>
+                            <button class="btn-add sub-item" onclick="addItem('lend')">+ 新增出借項目</button>
+                        </div>
                     </div>
                     <div class="section">
                         <div class="section-title">各式貸款 <span class="desc">各式信貸、理財型房貸</span></div>

@@ -1,3 +1,10 @@
+// 切換手動/自動模式
+function toggleManualMode() {
+    const isManual = document.getElementById('manual_mode').checked;
+    // 隱藏或禁用細項按鈕
+    document.querySelectorAll('.sub-item').forEach(btn => btn.disabled = isManual);
+    calc();
+}
 
 function calc() {
 	// 1. 取得數值
@@ -28,11 +35,24 @@ function calc() {
 		foreign_a += val;      // 直接計入台幣
 		
 	});
+
+	const isManual = document.getElementById('manual_mode').checked;
+    let s_total = 0;
+
+    if (isManual) {
+        // 手動模式：直接讀取主欄位
+        s_total = parseFloat(document.getElementById('stock_total').value) || 0;
+    } else {
+        // 自動模式：加總 集保 + 質押品市值(p_a) + 出借市值(l_a) + 複委託(foreign_a)
+        const base_stock = parseFloat(document.getElementById('stock_total').value) || 0;
+        s_total = base_stock + p_a + l_a + foreign_a; 
+    }
+	
 	// 2. 核心邏輯
 	// 總資產 = 現金 + 集保總持股(已含正二) + 質押品市值 + 出借市值 + 期貨權益數
 	// 總資產：加入複委託資產 (foreign_a)
-	const total_asset = s_total + p_a + l_a + f_e + foreign_a;
-	const total_debt = p_d + loan_d;
+	const total_asset = total_cash + s_total + f_e; 
+    const total_exp = s_total + s_2x + f_n; // 正二額外加 1 次 [cite: 66, 113]
 	const net_worth = total_asset - total_debt + total_cash;
 	
 	// 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值

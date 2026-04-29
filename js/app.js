@@ -74,31 +74,49 @@ function updateChart(cash, stock, pledge, lend, fut) {
     const data = [cash, stock + pledge + lend, fut];
     const labels = ['現金', '總持股', '期貨權益'];
 
+	// 計算總值以計算百分比 
+    const total = dataValues.reduce((a, b) => a + b, 0);
+	
     if (myChart) {
-        myChart.data.datasets[0].data = data;
+        myChart.data.datasets[0].data = dataValues;
         myChart.update();
     } else {
+        // 註冊外掛 
+        Chart.register(ChartDataLabels);
+
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: labels,
                 datasets: [{
-                        data: data,
-                        backgroundColor: ['#2ecc71', '#3498db', '#e67e22'], //'#f1c40f', '#9b59b6',
-                        borderWidth: 0
-                    }]
+                    data: dataValues,
+                    backgroundColor: ['#2ecc71', '#3498db', '#e67e22', '#9b59b6'],
+                    borderWidth: 0
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {position: 'bottom', labels: {boxWidth: 12}},
-                    title: {display: true, text: '資產配置分布'}
+                    legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                    title: { display: true, text: '資產配置分布' },
+                    // 配置百分比標籤 
+                    datalabels: {
+                        color: '#fff',
+                        formatter: (value) => {
+                            if (value > 0 && total > 0) {
+                                let percentage = (value * 100 / total).toFixed(1) + "%";
+                                return percentage;
+                            } else {
+                                return null; // 數值為 0 時不顯示標籤，保持畫面乾淨 
+                            }
+                        },
+                        font: { weight: 'bold' }
+                    }
                 }
             }
         });
     }
-}
 
 function save() {
     // 獲取當前日期與時間

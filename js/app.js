@@ -69,19 +69,23 @@ function autoCalcLend(row) {
 }
 
 
+// 2. 修正後的 updateChart 函數
 function updateChart(cash, stock, pledge, lend, fut) {
     const ctx = document.getElementById('assetChart').getContext('2d');
-    const data = [cash, stock + pledge + lend, fut];
+    
+    // 統一變數名稱為 data
+    const data = [cash, stock + pledge + lend, fut]; 
     const labels = ['現金', '總持股', '期貨權益'];
 
-	// 計算總值以計算百分比 
-    const total = dataValues.reduce((a, b) => a + b, 0);
-	
+    // 修正：使用 data 進行 reduce 計算總值
+    const total = data.reduce((a, b) => a + b, 0);
+    
     if (myChart) {
-        myChart.data.datasets[0].data = dataValues;
+        // 修正：更新時使用正確的變數 data
+        myChart.data.datasets[0].data = data; 
         myChart.update();
     } else {
-        // 註冊外掛 
+        // 註冊外掛 (確保 HTML 已引入 ChartDataLabels 腳本)
         Chart.register(ChartDataLabels);
 
         myChart = new Chart(ctx, {
@@ -89,7 +93,7 @@ function updateChart(cash, stock, pledge, lend, fut) {
             data: {
                 labels: labels,
                 datasets: [{
-                    data: dataValues,
+                    data: data, // 修正：此處應為 data
                     backgroundColor: ['#2ecc71', '#3498db', '#e67e22', '#9b59b6'],
                     borderWidth: 0
                 }]
@@ -100,15 +104,15 @@ function updateChart(cash, stock, pledge, lend, fut) {
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 12 } },
                     title: { display: true, text: '資產配置分布' },
-                    // 配置百分比標籤 
                     datalabels: {
                         color: '#fff',
                         formatter: (value) => {
+                            // 當數值大於 0 時才顯示百分比，保持畫面乾淨 [cite: 19, 108]
                             if (value > 0 && total > 0) {
                                 let percentage = (value * 100 / total).toFixed(1) + "%";
                                 return percentage;
                             } else {
-                                return null; // 數值為 0 時不顯示標籤，保持畫面乾淨 
+                                return null; 
                             }
                         },
                         font: { weight: 'bold' }
@@ -117,6 +121,7 @@ function updateChart(cash, stock, pledge, lend, fut) {
             }
         });
     }
+} // 補上遺失的結束大括號
 
 function save() {
     // 獲取當前日期與時間

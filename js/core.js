@@ -111,11 +111,12 @@ function calc() {
     const simNetTotal = net_worth + simNetChange;
 
     // 更新介面顯示
+	// 將 Math.round 替換為 toFixed(1) 顯示到小數點第一位
     const changeEl = document.getElementById('sim_net_change');
-    changeEl.innerText = (simNetChange > 0 ? "+" : "") + Math.round(simNetChange);
+    changeEl.innerText = (simNetChange > 0 ? "+" : "") + simNetChange.toFixed(1);
     changeEl.style.color = simNetChange >= 0 ? "#e74c3c" : "#27ae60"; // 漲顯紅(損益變動), 跌顯綠
 
-    document.getElementById('sim_net_total').innerText = Math.round(simNetTotal);
+    document.getElementById('sim_net_total').innerText = simNetTotal.toFixed(1);
 
     // 5. 質押維持率預警模擬 
     let  = "";

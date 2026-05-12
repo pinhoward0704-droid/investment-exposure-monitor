@@ -70,7 +70,7 @@ function calc() {
     let debtRatio = total_asset > 0 ? (total_debt / total_asset) * 100 : 0;
 
 	// 3. 更新介面
-	document.getElementById('res_total').innerText = Math.round(total_asset) + " 萬";
+	document.getElementById('res_total').innerText = Math.round(total_asset-total_cash) + " 萬";//總投資(不含現金)
 	document.getElementById('res_loan').innerText = Math.round(total_debt) + " 萬";
 	
 	document.getElementById('res_net').innerText = Math.round(net_worth) + " 萬";

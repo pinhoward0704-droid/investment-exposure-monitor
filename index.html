@@ -28,7 +28,7 @@
                         <div class="section-title">流動資產 <span class="desc">現金與銀行存款</span></div>
                         <div class="row">
                             <label>集保匯整存款：</label>
-                            <input type="number" id="cash_central" class="watch" placeholder="0">
+                            <input type="number" id="cash_central" class="watch" placeholder="0" step="any">
                         </div>
                         <div id="cash_list"></div>
                         <button class="btn-add" onclick="addItem('cash')">+ 新增其他存款</button>
@@ -44,11 +44,11 @@
                     
                         <div class="section">
                             <label>集保總值(含正二)：</label>
-                            <input type="number" id="stock_total" class="watch" placeholder="0">
+                            <input type="number" id="stock_total" class="watch" placeholder="0" step="any">
                         </div>
                         <div class="section">
                             <label>正二總持股市值：</label>
-                            <input type="number" id="stock_2x" class="watch" placeholder="0">
+                            <input type="number" id="stock_2x" class="watch" placeholder="0" step="any">
                         </div>
                         <div class="section">
                             <div id="foreign_list"></div>
@@ -75,11 +75,11 @@
                         <div class="section-title">衍生性商品 <span class="desc">期貨合約管理</span></div>
                         <div class="row">
                             <label>名目價值 <span class="badge">合約總價-加入總曝險金額</span></label>
-                            <input type="number" id="fut_notional" class="watch" placeholder="0">
+                            <input type="number" id="fut_notional" class="watch" placeholder="0" step="any">
                         </div>
                         <div class="row">
                             <label>權益數 <span class="badge">平倉淨值-加入總資產</span></label>
-                            <input type="number" id="fut_equity" class="watch" placeholder="0">
+                            <input type="number" id="fut_equity" class="watch" placeholder="0" step="any">
                         </div>
                     </div>
                 </div>

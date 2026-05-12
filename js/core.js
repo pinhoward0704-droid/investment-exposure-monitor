@@ -60,8 +60,8 @@ function calc() {
 	const total_asset = total_cash + s_total + f_e; 
     const total_exp = s_total + s_2x + f_n; // 正二額外加 1 次 [cite: 66, 113]
 	
-	//淨資產= 總投資 - 總負債 + 現金
-	const net_worth = total_asset - total_debt + total_cash;
+	//淨資產= 總投資 - 總負債 
+	const net_worth = total_asset - total_debt;
 	
 	// 總曝險 = 集保總持股 + 額外加計1次正二 + 質押品市值 + 出借市值 + 期貨名目價值
 	//const total_exp = s_total + s_2x + p_a + l_a + f_n + foreign_a;
